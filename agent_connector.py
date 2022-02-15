@@ -30,3 +30,19 @@ class AtariConnector(psl.AgentConnector):
             self.new_vision_update_wme.update_wm(input_link)
             self.new_vision_update = False
 
+
+class StateViewerConnector(psl.AgentConnector):
+    def __init__(self, agent):
+        super().__init__(agent)
+        self.agent = agent
+        self.gui = None
+
+    def add_gui(self, gui):
+        self.gui = gui
+    
+    def on_input_phase(self, input_link):
+        print("check")
+        state_text = self.agent.execute_command("p S1 -d 7", True)
+        self.gui.soar_state_viewer_callback(state_text)
+        print(state_text)
+        return super().on_input_phase(input_link)

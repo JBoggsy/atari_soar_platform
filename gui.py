@@ -14,7 +14,7 @@ SOAR_ALE_ENVS = ("Breakout-v0", "Breakout-v4")
 
 
 class SoarAleGui(tk.Tk):
-    def __init__(self, atari_agent, atari_connector):
+    def __init__(self, atari_agent, atari_connector, state_viewer_connector):
         super().__init__()
         
         self.title = "Soar-ALE Experiment Platform"
@@ -22,6 +22,7 @@ class SoarAleGui(tk.Tk):
 
         self.agent = atari_agent
         self.connector = atari_connector
+        self.state_viewer_connector = state_viewer_connector
 
         self.ale_game_selection = tk.StringVar()
         self.ale_action_str = tk.StringVar(value="Action Taken: ")
@@ -143,27 +144,35 @@ class SoarAleGui(tk.Tk):
                                                    orient=tk.VERTICAL,
                                                    command=self.soar_output_text.yview)
         self.soar_output_text.configure(yscrollcommand=self.soar_output_scrollbar.set)
+        
         self.soar_input_frame = ttk.Frame(self.soar_frame)
         self.soar_input_entry = ttk.Entry(self.soar_input_frame, textvariable=self.soar_user_input_str)
         self.soar_input_send_button = ttk.Button(self.soar_input_frame, text="Send", command=self.soar_input_send_callback)
         self.soar_input_step_button = ttk.Button(self.soar_input_frame, text="Step", command=self.soar_input_step_callback)
         self.soar_input_print_state_button = ttk.Button(self.soar_input_frame, text="State", command=self.soar_input_print_state_callback)
 
+        self.soar_state_viewer_frame = ttk.Frame(self.soar_frame)
+        self.soar_state_viewer_text = tk.Text(self.soar_state_viewer_frame, width=40, height=20)
+
         # Place frame and widgets in grid
         self.soar_frame.grid(column=1, row=0, sticky=tk.NSEW)
         self.soar_output_frame.grid(column=0, row=0, sticky=tk.NSEW)
         self.soar_output_text.grid(column=0, row=0, stick=tk.NSEW)
         self.soar_output_scrollbar.grid(column=1, row=0, sticky=tk.NSEW)
+
         self.soar_input_frame.grid(column=0, row=1, sticky=tk.NSEW)
         self.soar_input_entry.grid(column=0, row=0, sticky=tk.NSEW)
         self.soar_input_send_button.grid(column=1, row=0, sticky=tk.NSEW)
         self.soar_input_step_button.grid(column=2, row=0, sticky=tk.NSEW)
+        self.soar_input_print_state_button.grid(column=3, row=0, sticky=tk.NSEW)
+        
+        self.soar_state_viewer_frame.grid(column=1, row=0, sticky=tk.NSEW)
+        self.soar_state_viewer_text.grid(column=0, row=0, stick=tk.NSEW)
 
     def soar_output_callback(self, text):
         print(text)
         self.soar_output_text.insert(tk.END, text)
         self.soar_output_text.insert(tk.END, "\n")
-
 
     def soar_input_send_callback(self):
         self.agent.execute_command(self.soar_user_input_str.get(), True)
@@ -173,3 +182,7 @@ class SoarAleGui(tk.Tk):
 
     def soar_input_print_state_callback(self):
         self.agent.execute_command("p S1 -d 7", True)
+
+    def soar_state_viewer_callback(self, state_text):
+        self.soar_state_viewer_text.insert(tk.END, state_text)
+        self.soar_state_viewer_text.insert(tk.END, "\n")
