@@ -139,7 +139,7 @@ class SoarAleGui(tk.Tk):
         # Create soar frame and widgets
         self.soar_frame = ttk.Frame(self)
         self.soar_output_frame = ttk.Frame(self.soar_frame)
-        self.soar_output_text = tk.Text(self.soar_output_frame, width=80, height=20)
+        self.soar_output_text = tk.Text(self.soar_output_frame, width=100, height=100)
         self.soar_output_scrollbar = ttk.Scrollbar(self.soar_output_frame, 
                                                    orient=tk.VERTICAL,
                                                    command=self.soar_output_text.yview)
@@ -152,7 +152,7 @@ class SoarAleGui(tk.Tk):
         self.soar_input_print_state_button = ttk.Button(self.soar_input_frame, text="State", command=self.soar_input_print_state_callback)
 
         self.soar_state_viewer_frame = ttk.Frame(self.soar_frame)
-        self.soar_state_viewer_text = tk.Text(self.soar_state_viewer_frame, width=40, height=20)
+        self.soar_state_viewer_text = tk.Text(self.soar_state_viewer_frame, width=80, height=100)
 
         # Place frame and widgets in grid
         self.soar_frame.grid(column=1, row=0, sticky=tk.NSEW)
@@ -184,5 +184,6 @@ class SoarAleGui(tk.Tk):
         self.agent.execute_command("p S1 -d 7", True)
 
     def soar_state_viewer_callback(self, state_text):
+        self.soar_state_viewer_text.delete(1.0, tk.END)
         self.soar_state_viewer_text.insert(tk.END, state_text)
         self.soar_state_viewer_text.insert(tk.END, "\n")

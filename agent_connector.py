@@ -41,8 +41,6 @@ class StateViewerConnector(psl.AgentConnector):
         self.gui = gui
     
     def on_input_phase(self, input_link):
-        print("check")
         state_text = self.agent.execute_command("p S1 -d 7", True)
         self.gui.soar_state_viewer_callback(state_text)
         print(state_text)
-        return super().on_input_phase(input_link)
