@@ -1,4 +1,5 @@
 import base64
+from multiprocessing.sharedctypes import Value
 
 import cv2
 
@@ -10,6 +11,7 @@ class AtariConnector(psl.AgentConnector):
     def __init__(self, agent):
         super().__init__(agent)
         self.agent = agent
+        self.gui = None
         self.agent.execute_command("svs --enable")
 
         self.new_vision_update = False
@@ -30,15 +32,19 @@ class AtariConnector(psl.AgentConnector):
             self.new_vision_update_wme.update_wm(input_link)
             self.new_vision_update = False
 
+    def on_output_event(self, command_name, root_id):
+        if command_name == "take-action":
+            action_id = int(root_id.GetParameterValue("action-id"))
+        if self.gui is not None:
+            self.gui.step_env(action_id)
+        return super().on_output_event(command_name, root_id)
+
 
 class StateViewerConnector(psl.AgentConnector):
     def __init__(self, agent):
         super().__init__(agent)
         self.agent = agent
         self.gui = None
-
-    def add_gui(self, gui):
-        self.gui = gui
     
     def on_input_phase(self, input_link):
         state_text = self.agent.execute_command("p S1 -d 7", True)

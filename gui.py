@@ -87,23 +87,14 @@ class SoarAleGui(tk.Tk):
         if self.playing:
             return
         self.playing = True
-        self.after(self.frame_time_ms, self.step_env)
+        self.after(self.frame_time_ms, self.run_env_randomly)
 
     def ale_game_pause_callback(self):
         self.playing = False
 
 # GYM RUNNING STUFF
 ###################
-
-    def step_env(self):
-        if not self.playing:
-            return
-
-        if self.next_action is None:
-            action = self.current_environment.action_space.sample()
-        else:
-            action = self.next_action
-
+    def step_env(self, action):
         obs, rwrd, done, info = self.current_environment.step(action)
         self.update_observation(obs)
         self.current_reward = rwrd
@@ -116,7 +107,15 @@ class SoarAleGui(tk.Tk):
         self.ale_total_reward_str.set(f"Total reward: {self.cumulative_reward}")
         self.ale_playing_str.set(f"Playing: {self.playing}")
 
-        self.after(self.frame_time_ms, self.step_env)
+    def run_env_randomly(self):
+        if not self.playing:
+            return
+        if self.next_action is None:
+            action = self.current_environment.action_space.sample()
+        else:
+            action = self.next_action
+        self.step_env(action)
+        self.after(self.frame_time_ms, self.run_env_randomly)
 
     def update_observation(self, observation):
         self.current_observation = observation
@@ -170,9 +169,9 @@ class SoarAleGui(tk.Tk):
         self.soar_state_viewer_text.grid(column=0, row=0, stick=tk.NSEW)
 
     def soar_output_callback(self, text):
-        print(text)
         self.soar_output_text.insert(tk.END, text)
         self.soar_output_text.insert(tk.END, "\n")
+        print(text)
 
     def soar_input_send_callback(self):
         self.agent.execute_command(self.soar_user_input_str.get(), True)
