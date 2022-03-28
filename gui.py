@@ -62,6 +62,7 @@ class SoarAleGui(tk.Tk):
         self.ale_game_select_dropdown = ttk.Combobox(self.ale_frame, textvariable=self.ale_game_selection)
         self.ale_reset_button = ttk.Button(self.ale_frame, text="Reset", command=self.ale_game_reset_callback)
         self.ale_play_button = ttk.Button(self.ale_frame, text="Play", command=self.ale_game_play_callback)
+        self.ale_step_button = ttk.Button(self.ale_frame, text="Step", command=self.ale_game_step_callback)
         self.ale_pause_button = ttk.Button(self.ale_frame, text="Pause", command=self.ale_game_pause_callback)
         self.ale_game_select_dropdown['values'] = SOAR_ALE_ENVS
         self.ale_game_select_dropdown.state(["readonly"])
@@ -77,7 +78,8 @@ class SoarAleGui(tk.Tk):
         self.ale_game_select_dropdown.grid(column=2, row=0, sticky=(tk.N, tk.S, tk.W, tk.E))
         self.ale_reset_button.grid(column=2, row=1, sticky=(tk.N, tk.S, tk.W, tk.E))
         self.ale_play_button.grid(column=2, row=2, sticky=(tk.N, tk.S, tk.W, tk.E))
-        self.ale_pause_button.grid(column=2, row=3, sticky=(tk.N, tk.S, tk.W, tk.E))
+        self.ale_step_button.grid(column=2, row=3, sticky=(tk.N, tk.S, tk.W, tk.E))
+        self.ale_pause_button.grid(column=2, row=4, sticky=(tk.N, tk.S, tk.W, tk.E))
 
     def ale_game_reset_callback(self):
         self.current_environment = gym.make(self.ale_game_selection.get())
@@ -88,6 +90,11 @@ class SoarAleGui(tk.Tk):
             return
         self.playing = True
         self.after(self.frame_time_ms, self.run_env_randomly)
+
+    def ale_game_step_callback(self):
+        self.playing = True
+        self.step_env_randomly()
+        self.playing = False
 
     def ale_game_pause_callback(self):
         self.playing = False
@@ -107,7 +114,7 @@ class SoarAleGui(tk.Tk):
         self.ale_total_reward_str.set(f"Total reward: {self.cumulative_reward}")
         self.ale_playing_str.set(f"Playing: {self.playing}")
 
-    def run_env_randomly(self):
+    def step_env_randomly(self):
         if not self.playing:
             return
         if self.next_action is None:
@@ -115,6 +122,9 @@ class SoarAleGui(tk.Tk):
         else:
             action = self.next_action
         self.step_env(action)
+
+    def run_env_randomly(self):
+        self.step_env_randomly()
         self.after(self.frame_time_ms, self.run_env_randomly)
 
     def update_observation(self, observation):

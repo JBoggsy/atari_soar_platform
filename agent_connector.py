@@ -37,6 +37,7 @@ class AtariConnector(psl.AgentConnector):
             action_id = int(root_id.GetParameterValue("action-id"))
         if self.gui is not None:
             self.gui.step_env(action_id)
+            root_id.AddStatusComplete()
         return super().on_output_event(command_name, root_id)
 
 
@@ -49,4 +50,4 @@ class StateViewerConnector(psl.AgentConnector):
     def on_input_phase(self, input_link):
         state_text = self.agent.execute_command("p S1 -d 7", True)
         self.gui.soar_state_viewer_callback(state_text)
-        print(state_text)
+        # print(state_text)

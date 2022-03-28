@@ -13,6 +13,7 @@ if __name__ == "__main__":
                            watch_level=1)
     
     atari_connector = AtariConnector(agent)
+    atari_connector.add_output_command("take-action")
     agent.add_connector("atari", atari_connector)
 
     # state_view_connector = None
